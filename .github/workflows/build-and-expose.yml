@@ -60,7 +60,7 @@ jobs:
             --exclude-dir=.git \
             --exclude-dir=.venv \
             --exclude-dir=__pycache__ \
-            '(authtoken|api[_-]?key|password|secret)[[:space:]]*[:=][[:space:]]*[^[:space:]]+' . || true)
+            '(authtoken|api[_-]?key|password|secret)[[:space:]]*[:=][[:space:]]*[^[:space:]]+' . | grep -v '\${{[[:space:]]*secrets\.' || true)
           if [ -n "$matches" ]; then
             printf '%s\n' "$matches"
             exit 1
