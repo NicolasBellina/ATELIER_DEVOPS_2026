@@ -151,6 +151,18 @@ Pas de copier-coller, allez à la source :
 - **Trivy** (scan d'image) — `aquasecurity.github.io/trivy`
 - **GHCR** — `docs.github.com` → *Working with the Container registry*
 
+## Image GHCR
+
+L'image publiée par le pipeline est disponible sur GHCR : `ghcr.io/nicolasbellina/atelier_devops_2026`.
+
+Pour la récupérer :
+
+```bash
+docker pull ghcr.io/nicolasbellina/atelier_devops_2026:latest
+```
+
+Les autres tags utiles sont `sha-<short>` pour un commit précis et `pr-<num>` pour une pull request. Vérifiez aussi que le package est visible publiquement dans l'onglet *Packages* du dépôt.
+
 ---
 
 ## Licence et contributions
