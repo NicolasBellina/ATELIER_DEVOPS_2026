@@ -48,25 +48,12 @@ jobs:
         run: |
           url=""
           for _ in $(seq 1 60); do
-            url=$(python - <<'PY'
-import json
-import urllib.request
-
-try:
-    with urllib.request.urlopen("http://127.0.0.1:4040/api/tunnels") as response:
-        data = json.load(response)
-except Exception:
-    print("")
-else:
-    for tunnel in data.get("tunnels", []):
-        public_url = tunnel.get("public_url", "")
-        if public_url.startswith("https://"):
-            print(public_url)
-            break
-    else:
-        print("")
-PY
-)
+            url=$(python -c 'import json,urllib.request;\
+try:\
+    data=json.load(urllib.request.urlopen("http://127.0.0.1:4040/api/tunnels"));\
+    print(next((t.get("public_url", "") for t in data.get("tunnels", []) if t.get("public_url", "").startswith("https://")), ""))\
+except Exception:\
+    print("")')
             if [ -n "$url" ]; then
               echo "URL publique Ngrok: $url"
               {
