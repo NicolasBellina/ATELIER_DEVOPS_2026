@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - exo-1-docker
+      - exo-2-tests
+      - exo-3-securite
   workflow_dispatch:
 
 jobs:
@@ -30,8 +32,47 @@ jobs:
       - name: Run tests
         run: pytest
 
-  ngrok:
+  security:
     needs: quality
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: atelier-devops-flask
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Scan repository for secrets
+        run: |
+          matches=$(grep -RInE \
+            --include='*.py' \
+            --include='*.yml' \
+            --include='*.yaml' \
+            --include='*.toml' \
+            --include='*.txt' \
+            --include='Dockerfile' \
+            --exclude-dir=.git \
+            --exclude-dir=.venv \
+            --exclude-dir=__pycache__ \
+            '(authtoken|api[_-]?key|password|secret)[[:space:]]*[:=][[:space:]]*[^[:space:]]+' . || true)
+          if [ -n "$matches" ]; then
+            printf '%s\n' "$matches"
+            exit 1
+          fi
+
+      - name: Build Docker image
+        run: docker build -t "$IMAGE_NAME" .
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}
+          format: table
+          exit-code: "1"
+          severity: CRITICAL
+          ignore-unfixed: true
+
+  ngrok:
+    needs: [quality, security]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
