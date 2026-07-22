@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - exo-1-docker
+      - exo-2-tests
   workflow_dispatch:
 
 jobs:
